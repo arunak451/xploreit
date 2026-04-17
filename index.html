@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XploreiT Corp - Student Enquiry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.umd.js"></script>
+    <style>
+        :root {
+            --bg:       #0c0e1a;
+            --surface:  #13152a;
+            --border:   #1e2240;
+            --accent:   #00e5b0;
+            --accent2:  #7c6fff;
+            --text:     #e8eaf6;
+            --muted:    #6b7099;
+            --danger:   #ff5c7a;
+            --warn:     #ffb547;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── Header ─────────────────────────────────────────── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); }
+        .logo span { color: var(--text); }
+        .tagline { font-size: 12px; color: var(--muted); margin-left: 4px; }
+
+        .backend-pill {
+            margin-left: auto;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .backend-pill.ok  { border-color: var(--accent); color: var(--accent); }
+        .backend-pill.err { border-color: var(--danger); color: var(--danger); }
+
+        /* ── Hero ───────────────────────────────────────────── */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 400px;
+            background: radial-gradient(ellipse, rgba(124,111,255,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(32px, 6vw, 58px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .hero h1 em { font-style: normal; color: var(--accent); }
+        .hero p { font-size: 18px; color: var(--muted); max-width: 500px; margin: 0 auto; }
+
+        /* ── Stats ──────────────────────────────────────────── */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            max-width: 700px;
+            margin: 0 auto 60px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .stat {
+            flex: 1;
+            text-align: center;
+            padding: 24px 20px;
+            border-right: 1px solid var(--border);
+        }
+        .stat:last-child { border-right: none; }
+        .stat h3 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: var(--accent); }
+        .stat p  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+        /* ── Layout ─────────────────────────────────────────── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+
+        /* ── Card ───────────────────────────────────────────── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+        }
+        .card h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        /* ── Form ───────────────────────────────────────────── */
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 7px; font-weight: 500; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--accent2);
+        }
+        .form-group select option { background: var(--surface); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Syne', sans-serif;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            letter-spacing: 0.5px;
+        }
+        .submit-btn:hover    { opacity: 0.9; transform: translateY(-1px); }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .msg {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 14px;
+            text-align: center;
+        }
+        .msg.success { background: rgba(0,229,176,0.1); border: 1px solid var(--accent); color: var(--accent); }
+        .msg.error   { background: rgba(255,92,122,0.1); border: 1px solid var(--danger); color: var(--danger); }
+        .msg.partial { background: rgba(255,181,71,0.1); border: 1px solid var(--warn); color: var(--warn); }
+
+        /* ── Test Panel ─────────────────────────────────────── */
+        .test-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .t-btn {
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .t-btn:hover           { border-color: var(--accent2); color: var(--accent2); }
+        .t-btn.t-green:hover   { border-color: var(--accent); color: var(--accent); }
+        .t-btn.t-red:hover     { border-color: var(--danger); color: var(--danger); }
+
+        .log-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 11.5px;
+            max-height: 220px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+        .log-ok   { color: var(--accent); }
+        .log-err  { color: var(--danger); }
+        .log-warn { color: var(--warn); }
+        .log-dim  { color: var(--muted); }
+        .log-info { color: var(--accent2); }
+
+        /* ── Voice Call FAB ─────────────────────────────────── */
+        .fab {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            width: 58px; height: 58px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 0 0 rgba(0,229,176,0.4);
+            animation: fabpulse 2.5s infinite;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .fab:hover { transform: scale(1.08); }
+        .fab svg   { width: 26px; height: 26px; fill: #000; }
+        @keyframes fabpulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(0,229,176,0.4); }
+            50%      { box-shadow: 0 0 0 12px rgba(0,229,176,0); }
+        }
+
+        .call-status {
+            position: fixed;
+            bottom: 100px; right: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 13px;
+            z-index: 999;
+            display: none;
+            min-width: 210px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .call-status.active { display: block; }
+        .dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-right: 7px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+        .end-btn {
+            margin-top: 12px;
+            padding: 7px 18px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div>
+        <div class="logo">⚡ XploreiT<span> Corp</span></div>
+        <div class="tagline">Design Your Desire · Coimbatore</div>
+    </div>
+    <button class="backend-pill" id="backendPill" onclick="checkBackend()">⬤ Backend...</button>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-badge">AI Voice Agent — Live</div>
+    <h1>Become <em>Job-Ready</em><br>in 90 Days!</h1>
+    <p>Coimbatore's most trusted software training institute since 2012.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats" style="max-width:700px;margin:0 auto 50px;">
+    <div class="stat"><h3>1.8L+</h3><p>Students Trained</p></div>
+    <div class="stat"><h3>93.5%</h3><p>Placement Record</p></div>
+    <div class="stat"><h3>12+</h3><p>Years Experience</p></div>
+    <div class="stat"><h3>5 ⭐</h3><p>Rated Institute</p></div>
+</div>
+
+<!-- Main Grid -->
+<div class="main-grid">
+
+    <!-- Enquiry Form -->
+    <div class="card">
+        <h2>📋 Student Enquiry</h2>
+        <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="name" placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="yourname@email.com">
+        </div>
+        <div class="form-group">
+            <label>Mobile Number * (E.164 format)</label>
+            <input type="tel" id="phone" placeholder="+91XXXXXXXXXX">
+        </div>
+        <div class="form-group">
+            <label>Course Interested In *</label>
+            <select id="course">
+                <option value="">Select a course</option>
+                <option value="Python Full Stack">Python Full Stack</option>
+                <option value="Java Development">Java Development</option>
+                <option value="AI & Machine Learning">AI & Machine Learning</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Data Analytics">Data Analytics</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Digital Marketing">Digital Marketing</option>
+                <option value="Cloud Computing">Cloud Computing</option>
+                <option value="Software Testing">Software Testing</option>
+                <option value="Cyber Security">Cyber Security</option>
+                <option value="Embedded Systems">Embedded Systems</option>
+            </select>
+        </div>
+        <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+            🚀 Submit & Get AI Call
+        </button>
+        <div class="msg" id="formMsg"></div>
+    </div>
+
+    <!-- Test Panel -->
+    <div class="card">
+        <h2>🧪 Test Panel</h2>
+        <div class="test-btns">
+            <button class="t-btn t-green" onclick="checkBackend()">✅ Backend Health</button>
+            <button class="t-btn"         onclick="testVapi()">📞 Vapi API Key</button>
+            <button class="t-btn"         onclick="testWebVoice()">🎙️ Web Voice Test</button>
+            <button class="t-btn t-red"   onclick="clearLog()">🗑️ Clear</button>
+        </div>
+        <div class="log-box" id="logBox">
+            <span class="log-dim">// Logs appear here...</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- Voice FAB -->
+<button class="fab" id="fab" onclick="toggleVoice()" title="Talk to AI Agent">
+    <svg viewBox="0 0 24 24"><path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V6zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+</button>
+
+<!-- Call Status -->
+<div class="call-status" id="callStatus">
+    <div><span class="dot"></span><span id="statusText">Connecting...</span></div>
+    <button class="end-btn" onclick="endVoice()">End Call</button>
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+const BACKEND      = "http://localhost:8000";
+const VAPI_PUB_KEY = "7d130044-a1ee-469d-8789-cf20a972521e";
+const ASSISTANT_ID = "3d033ce9-3a72-41b0-adc0-53344858c75b";
+
+// ── Vapi Web SDK ──────────────────────────────────────────────────────────────
+const vapi = new Vapi(VAPI_PUB_KEY);
+let voiceActive = false;
+
+vapi.on("call-start",   () => { setStatus("AI Agent Connected!"); });
+vapi.on("call-end",     () => { document.getElementById("callStatus").classList.remove("active"); voiceActive = false; });
+vapi.on("speech-start", () => setStatus("Agent is speaking..."));
+vapi.on("speech-end",   () => setStatus("Listening..."));
+vapi.on("error",        (e) => log("err", "Vapi error: " + e.message));
+
+function toggleVoice() {
+    voiceActive ? endVoice() : startVoice();
+}
+function startVoice() {
+    voiceActive = true;
+    document.getElementById("callStatus").classList.add("active");
+    setStatus("Connecting...");
+    vapi.start(ASSISTANT_ID);
+    log("info", "Web voice call started...");
+}
+function endVoice() {
+    vapi.stop();
+    voiceActive = false;
+}
+function setStatus(txt) {
+    document.getElementById("statusText").textContent = txt;
+}
+
+// ── Logging ───────────────────────────────────────────────────────────────────
+function log(type, msg) {
+    const box = document.getElementById("logBox");
+    const span = document.createElement("div");
+    const time = new Date().toLocaleTimeString("en-IN", { hour12: false });
+    span.className = `log-${type}`;
+    span.textContent = `[${time}] ${msg}`;
+    if (box.firstChild?.className === "log-dim") box.innerHTML = "";
+    box.appendChild(span);
+    box.scrollTop = box.scrollHeight;
+}
+function clearLog() {
+    document.getElementById("logBox").innerHTML = '<span class="log-dim">// Cleared.</span>';
+}
+
+// ── Backend Health ────────────────────────────────────────────────────────────
+async function checkBackend() {
+    const pill = document.getElementById("backendPill");
+    pill.textContent = "⬤ Checking...";
+    pill.className = "backend-pill";
+    try {
+        const res  = await fetch(`${BACKEND}/`);
+        const data = await res.json();
+        pill.textContent = "⬤ Backend: Online";
+        pill.className = "backend-pill ok";
+        log("ok", "Backend online: " + data.status);
+    } catch {
+        pill.textContent = "⬤ Backend: Offline";
+        pill.className = "backend-pill err";
+        log("err", "Backend offline! Run: uvicorn server:app --reload");
+    }
+}
+
+// ── Vapi API Key Test ─────────────────────────────────────────────────────────
+async function testVapi() {
+    log("info", "Testing Vapi connection...");
+    try {
+        const res  = await fetch(`${BACKEND}/test-vapi`);
+        const data = await res.json();
+        if (data.assistant) {
+            log("ok",   `Vapi OK! Assistant: "${data.assistant}"`);
+            log("info", `Assistant ID: ${data.assistant_id}`);
+        } else {
+            log("err", "Vapi test failed: " + JSON.stringify(data));
+        }
+    } catch {
+        log("err", "Cannot reach backend for Vapi test.");
+    }
+}
+
+// ── Web Voice Test ────────────────────────────────────────────────────────────
+function testWebVoice() {
+    log("info", "Starting Vapi web voice call...");
+    startVoice();
+}
+
+// ── Form Submit ───────────────────────────────────────────────────────────────
+async function submitForm() {
+    const name   = document.getElementById("name").value.trim();
+    const email  = document.getElementById("email").value.trim();
+    const phone  = document.getElementById("phone").value.trim();
+    const course = document.getElementById("course").value;
+
+    // Validation
+    if (!name || !phone || !course) {
+        showMsg("error", "Please fill Name, Phone & Course!");
+        return;
+    }
+    if (!phone.startsWith("+")) {
+        showMsg("error", "Phone must be E.164 format: +91XXXXXXXXXX");
+        return;
+    }
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
+    log("info", `Submitting: ${name} | ${phone} | ${course}`);
+
+    try {
+        const res  = await fetch(`${BACKEND}/submit`, {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({ name, email, phone, course }),
+        });
+        const data = await res.json();
+
+        if (data.status === "success") {
+            showMsg("success", `✅ ${data.message}`);
+            btn.textContent = "✅ Submitted!";
+            log("ok",   `Form submitted! Call ID: ${data.call_id}`);
+            log("info", `Excel: ${data.details?.excel} | Email: ${data.details?.email}`);
+        } else if (data.status === "partial") {
+            showMsg("partial", `⚠️ ${data.message}`);
+            btn.disabled = false;
+            btn.textContent = "🚀 Submit & Get AI Call";
+            log("warn", "Partial: " + data.message);
+        } else {
+            showMsg("error", "Error: " + data.message);
+            btn.disabled = false;
+            btn.textContent = "🚀 Submit & Get AI Call";
+            log("err", "Submit error: " + JSON.stringify(data));
+        }
+    } catch (err) {
+        showMsg("error", "Cannot reach server! Make sure backend is running.");
+        btn.disabled = false;
+        btn.textContent = "🚀 Submit & Get AI Call";
+        log("err", "Fetch error: " + err.message);
+    }
+}
+
+function showMsg(type, text) {
+    const el = document.getElementById("formMsg");
+    el.className = `msg ${type}`;
+    el.textContent = text;
+    el.style.display = "block";
+}
+
+// Auto-check backend on load
+window.addEventListener("load", () => setTimeout(checkBackend, 800));
+</script>
+
+</body>
+</html>
